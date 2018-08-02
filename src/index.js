@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 
 import "src/styles/app.scss";
-import "src/styles/normalize.css";
+import "src/styles/normalize.scss";
 import * as styles from "./style.scss";
 
 const App = () => (
@@ -11,7 +11,9 @@ const App = () => (
     <div className={styles.welcomeMessage}>
       This is your React App. Congratulations on setting it up!
     </div>
-    <div className={styles.welcomeMessage.concat(" ").concat(styles.emoji)}>🚀</div>
+    <div className={styles.welcomeMessage.concat(" ").concat(styles.emoji)}>
+      🚀
+    </div>
   </div>
 );
 
