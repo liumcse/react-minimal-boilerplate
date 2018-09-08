@@ -38,7 +38,33 @@ const config = {
         use: [{ loader: "file-loader" }]
       },
       {
-        test: /\.s?css$/,
+        test: /\.css$/,
+        exclude: ["node_modules"],
+        use: [
+          {
+            loader: devMode ? "style-loader" : MiniCssExtractPlugin.loader
+          },
+          {
+            loader: "css-loader",
+            options: {
+              importLoaders: 1,
+              minimize: true,
+              sourceMap: true,
+              camelCase: true
+            }
+          },
+          {
+            loader: "postcss-loader",
+            options: {
+              config: {
+                path: path.resolve(PROJECT_ROOT, "postcss.config.js")
+              }
+            }
+          }
+        ]
+      },
+      {
+        test: /\.scss$/,
         exclude: ["node_modules"],
         use: [
           {
@@ -49,7 +75,6 @@ const config = {
             options: {
               minimize: true,
               sourceMap: true,
-              localIdentName: "[hash:base64:10]",
               importLoaders: 1,
               modules: true,
               camelCase: true
