@@ -1,1 +1,1 @@
-## Add components here
+## Add common components here

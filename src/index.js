@@ -1,20 +1,22 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import * as ROUTES from "@routes";
 
+// Import routes
+import PageHome from "@routes/PageHome";
+
+// Import global style
 import "src/styles/app.scss";
 import "src/styles/normalize.scss";
-import * as styles from "./style.scss";
 
 const App = () => (
-  <div className={styles.appContainer}>
-    <div className={styles.welcomeHeader}>Hello, World!</div>
-    <div className={styles.welcomeMessage}>
-      This is your React App. Congratulations on setting it up!
-    </div>
-    <div className={styles.welcomeMessage.concat(" ").concat(styles.emoji)}>
-      🚀
-    </div>
-  </div>
+  <Router>
+    <Switch>
+      <Route exact path={ROUTES.ROUTE_HOME} component={PageHome} />
+      {/* Add more routes here */}
+    </Switch>
+  </Router>
 );
 
 ReactDOM.render(<App />, document.getElementById("app"));

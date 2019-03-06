@@ -4,6 +4,8 @@ const CleanWebpackPlugin = require("clean-webpack-plugin");
 const devMode = process.env.NODE_ENV !== "production";
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const CompressionPlugin = require("compression-webpack-plugin");
+const ScriptExtHtmlWebpackPlugin = require("script-ext-html-webpack-plugin");
 
 // constants
 const OUTPUT_PATH = path.resolve(__dirname, "../dist");
@@ -11,7 +13,7 @@ const SRC_PATH = path.resolve(__dirname, "../src");
 const PROJECT_ROOT = path.resolve(__dirname, "../");
 
 const config = {
-  entry: ["babel-polyfill", SRC_PATH + "/index.js"],
+  entry: ["@babel/polyfill", SRC_PATH + "/index.js"],
   output: {
     filename: "[name].[hash].js",
     publicPath: "/",
@@ -19,14 +21,16 @@ const config = {
   },
   resolve: {
     alias: {
-      src: SRC_PATH
+      src: SRC_PATH,
+      "@routes": SRC_PATH + "/routes",
+      "@components": SRC_PATH + "/components"
     }
   },
   module: {
     rules: [
       {
         test: /\.(js|jsx)$/,
-        exclude: ["node_modules"],
+        exclude: /node_modules/,
         use: [{ loader: "babel-loader" }]
       },
       {
@@ -34,12 +38,11 @@ const config = {
           /\.(png|jpg|gif|woff|woff2|eot|ttf|svg)/,
           /\/typefaces\/.*\.svg/
         ],
-        exclude: ["node_modules"],
+        exclude: /node_modules/,
         use: [{ loader: "file-loader" }]
       },
       {
         test: /\.css$/,
-        exclude: ["node_modules"],
         use: [
           {
             loader: devMode ? "style-loader" : MiniCssExtractPlugin.loader
@@ -65,7 +68,6 @@ const config = {
       },
       {
         test: /\.scss$/,
-        exclude: ["node_modules"],
         use: [
           {
             loader: devMode ? "style-loader" : MiniCssExtractPlugin.loader
@@ -104,21 +106,10 @@ const config = {
   },
   optimization: {
     splitChunks: {
-      chunks: "all",
-      minChunks: 1,
-      maxAsyncRequests: 5,
-      maxInitialRequests: 3,
-      automaticNameDelimiter: "~",
-      name: true,
       cacheGroups: {
         vendors: {
           test: /[\\/]node_modules[\\/]/,
-          priority: -10
-        },
-        default: {
-          minChunks: 2,
-          priority: -20,
-          reuseExistingChunk: true
+          chunks: "all"
         }
       }
     },
@@ -128,7 +119,7 @@ const config = {
         cache: true,
         parallel: true,
         uglifyOptions: {
-          compress: false,
+          compress: {},
           ecma: 6,
           mangle: true
         },
@@ -137,17 +128,26 @@ const config = {
     ]
   },
   plugins: [
+    new CompressionPlugin(),
     new HtmlWebpackPlugin({
-      template: PROJECT_ROOT + "/index.html"
+      template: PROJECT_ROOT + "/index.html",
+      minify: {
+        collapseWhitespace: true,
+        preserveLineBreaks: true,
+        minifyJS: true,
+        removeComments: true
+      }
     }),
     new CleanWebpackPlugin([OUTPUT_PATH], {
       root: PROJECT_ROOT
     }),
     new MiniCssExtractPlugin({
-      // Options similar to the same options in webpackOptions.output
-      // both options are optional
       filename: devMode ? "[name].css" : "[name].[hash].css",
       chunkFilename: devMode ? "[id].css" : "[id].[hash].css"
+    }),
+    new ScriptExtHtmlWebpackPlugin({
+      preload: /\.css$/,
+      defaultAttribute: "async"
     })
   ]
 };
